@@ -508,66 +508,66 @@ Resources:
               Name: DeployDev_AmazonMQ
               RoleArn: !Ref CodePipelineCrossAccountRoleArn1
               RunOrder: 3  
-        # - Name: Manual_Approval_QA
-        #   Actions:
-        #     - ActionTypeId:
-        #         Category: Approval
-        #         Owner: AWS
-        #         Version: '1'
-        #         Provider: Manual
-        #       InputArtifacts: []
-        #       OutputArtifacts: []
-        #       Name: Manual
-        #       RunOrder: 1
-        # - Name: Deploy_QA
-        #   Actions:
-        #     - ActionTypeId:
-        #         Category: Deploy
-        #         Owner: AWS
-        #         Provider: CloudFormation
-        #         Version: '1'
-        #       Configuration:
-        #         StackName: ec2-infrastructurte-poc
-        #         Capabilities: CAPABILITY_NAMED_IAM
-        #         RoleArn: !Sub 'arn:aws:iam::${TargetAccountId2}:role/CloudFormationDeploymentRole'
-        #         ActionMode: CREATE_UPDATE
-        #         TemplatePath: CodeBuildOutput::ec2-template.yaml
-        #         TemplateConfiguration: CodeBuildOutput::ec2-template-QA.json
-        #       InputArtifacts:
-        #         - Name: CodeBuildOutput
-        #       Name: DeployProd
-        #       RoleArn: !Ref CodePipelineCrossAccountRoleArn2
-        #       RunOrder: 1
-        # - Name: Manual_Approval_Prod
-        #   Actions:
-        #     - ActionTypeId:
-        #         Category: Approval
-        #         Owner: AWS
-        #         Version: '1'
-        #         Provider: Manual
-        #       InputArtifacts: []
-        #       OutputArtifacts: []
-        #       Name: Manual
-        #       RunOrder: 1
-        # - Name: Deploy_Prod
-        #   Actions:
-        #     - ActionTypeId:
-        #         Category: Deploy
-        #         Owner: AWS
-        #         Provider: CloudFormation
-        #         Version: '1'
-        #       Configuration:
-        #         StackName: ec2-infrastructurte-poc
-        #         Capabilities: CAPABILITY_NAMED_IAM
-        #         RoleArn: !Sub 'arn:aws:iam::${TargetAccountId3}:role/CloudFormationDeploymentRole'
-        #         ActionMode: CREATE_UPDATE
-        #         TemplatePath: CodeBuildOutput::ec2-template.yaml
-        #         TemplateConfiguration: CodeBuildOutput::ec2-template-PROD.json
-        #       InputArtifacts:
-        #         - Name: CodeBuildOutput
-        #       Name: DeployProd
-        #       RoleArn: !Ref CodePipelineCrossAccountRoleArn3
-              # RunOrder: 1
+        - Name: Manual_Approval_QA
+          Actions:
+            - ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Version: '1'
+                Provider: Manual
+              InputArtifacts: []
+              OutputArtifacts: []
+              Name: Manual
+              RunOrder: 1
+        - Name: Deploy_QA
+          Actions:
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                StackName: ec2-infrastructurte-poc
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !Sub 'arn:aws:iam::${TargetAccountId2}:role/CloudFormationDeploymentRole'
+                ActionMode: CREATE_UPDATE
+                TemplatePath: CodeBuildOutput::ec2-template.yaml
+                TemplateConfiguration: CodeBuildOutput::ec2-template-QA.json
+              InputArtifacts:
+                - Name: CodeBuildOutput
+              Name: DeployProd
+              RoleArn: !Ref CodePipelineCrossAccountRoleArn2
+              RunOrder: 1
+        - Name: Manual_Approval_Prod
+          Actions:
+            - ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Version: '1'
+                Provider: Manual
+              InputArtifacts: []
+              OutputArtifacts: []
+              Name: Manual
+              RunOrder: 1
+        - Name: Deploy_Prod
+          Actions:
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                StackName: ec2-infrastructurte-poc
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !Sub 'arn:aws:iam::${TargetAccountId3}:role/CloudFormationDeploymentRole'
+                ActionMode: CREATE_UPDATE
+                TemplatePath: CodeBuildOutput::ec2-template.yaml
+                TemplateConfiguration: CodeBuildOutput::ec2-template-PROD.json
+              InputArtifacts:
+                - Name: CodeBuildOutput
+              Name: DeployProd
+              RoleArn: !Ref CodePipelineCrossAccountRoleArn3
+              RunOrder: 1
       ArtifactStore:
         EncryptionKey:
           Id: !GetAtt ArtifactKey.Arn
