@@ -92,8 +92,8 @@ Resources:
             Resource: 
               - !Ref ArtifactBucketArn
               - !Sub '${ArtifactBucketArn}/*'
-              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-440873260229"
-              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-440873260229/*"                  
+              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-xx4087xxxxxxx"
+              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-xx087xxxxxxx/*"                  
           - Action:
               - kms:DescribeKey
               - kms:GenerateDataKey*
@@ -145,8 +145,8 @@ Resources:
             Resource: 
               - !Ref ArtifactBucketArn
               - !Sub '${ArtifactBucketArn}/*'
-              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-760553244526"
-              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-760553244526/*"              
+              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-xx055xxxxxxx"
+              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-xx055xxxxxxx/*"              
           - Action:
               - kms:DescribeKey
               - kms:Decrypt
