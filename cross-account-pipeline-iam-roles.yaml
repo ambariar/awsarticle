@@ -1,0 +1,189 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  This template deploys a codepipeline and associated resources for cross account deployments. This is the second of two templates. 
+  This template is to be deployed in the target cross-account. The first template is applied in the host account where codepipeline resides.
+
+Metadata:
+
+  CovestroCrossAccountPipeline:
+    EntrypointName: "Launch in target account"
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Host pipeline account 
+        Parameters:
+          - AccountId
+          - ArtifactBucketArn
+          - ArtifactKey
+      - Label:
+          default: Target account IAM
+        Parameters:
+          - CrossAccountRoleName
+          - CloudFormationDeploymentRoleName
+
+    ParameterLabels:
+      HostAccountId:
+        Default: HostAccount Id
+      ArtifactBucketArn:
+        Default: Artifact Bucket Arn
+      ArtifactKey:
+        Default: Artifact Key Arn
+      CrossAccountRoleName:
+        Default: Cross Account Role Name
+      CloudFormationDeploymentRoleName:
+        Default: CloudFormation Deployment Role Name
+
+Parameters:
+  HostAccountId:
+    Description: Host account id
+    Type: String
+  ArtifactBucketArn:
+    Description: Artifact bucket Arn
+    Type: String
+  ArtifactKey:
+    Description: Artifact bucket KMS Arn (leave blank if first run of template)
+    Type: String
+  CrossAccountRoleName:
+    Description: Cross account role name
+    Default: CodePipelineCrossAccountRole 
+    Type: String
+  CloudFormationDeploymentRoleName:
+    Description: Cloudformation deployment role name
+    Default: CloudFormationDeploymentRole
+    Type: String
+
+Conditions:
+  CreateCrossAccountRolePolicy: !Not 
+    - !Equals 
+      - !Ref ArtifactKey
+      - ''
+
+Resources:
+
+  CrossAccountRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref CrossAccountRoleName
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal: 
+              AWS: !Sub 'arn:aws:iam::${HostAccountId}:root'
+        Version: "2012-10-17"
+
+  CrossAccountRolePolicy:
+    Type: AWS::IAM::Policy
+    Condition: CreateCrossAccountRolePolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - cloudformation:*
+              - codedeploy:*
+              - iam:PassRole
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - s3:Get*
+              - s3:Put*
+              - s3:ListBucket
+            Effect: Allow
+            Resource: 
+              - !Ref ArtifactBucketArn
+              - !Sub '${ArtifactBucketArn}/*'
+              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-440873260229"
+              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-440873260229/*"                  
+          - Action:
+              - kms:DescribeKey
+              - kms:GenerateDataKey*
+              - kms:Encrypt
+              - kms:ReEncrypt*
+              - kms:Decrypt
+            Effect: Allow
+            Resource:
+              - !Ref ArtifactKey
+        Version: "2012-10-17"
+      PolicyName: CodeBuildRoleDefaultPolicy
+      Roles:
+        - !Ref CrossAccountRole
+
+
+  CloudFormationDeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref CloudFormationDeploymentRoleName
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: 
+                - cloudformation.amazonaws.com
+                - codedeploy.amazonaws.com
+        Version: "2012-10-17"
+
+  CloudFormationDeploymentRolePolicy:
+    Type: AWS::IAM::Policy
+    Condition: CreateCrossAccountRolePolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - iam:PassRole
+              - iam:GetRole
+              - iam:CreateRole
+              - iam:AttachRolePolicy
+              - iam:CreatePolicy
+            Effect: Allow
+            Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/*'
+          - Action:
+              - s3:GetObject*
+              - s3:GetBucket*
+              - s3:List*
+            Effect: Allow
+            Resource: 
+              - !Ref ArtifactBucketArn
+              - !Sub '${ArtifactBucketArn}/*'
+              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-760553244526"
+              - "arn:aws:s3:::pipeline-source-bucket-us-east-1-760553244526/*"              
+          - Action:
+              - kms:DescribeKey
+              - kms:Decrypt
+            Effect: Allow
+            Resource:
+              - !Ref ArtifactKey
+          - Action:
+              - cloudformation:CreateStack
+              - cloudformation:DescribeStack*
+              - cloudformation:GetStackPolicy
+              - cloudformation:GetTemplate*
+              - cloudformation:SetStackPolicy
+              - cloudformation:UpdateStack
+              - cloudformation:ValidateTemplate
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:aws:cloudformation:${AWS::Region}::${AWS::AccountId}:stack/ProdApplicationDeploymentStack*'
+          - Action:
+              - codedeploy:*
+            Effect: Allow
+            Resource:
+              - "*"               
+          - Action: "*"
+            Effect: Allow
+            Resource: "*"
+
+        Version: "2012-10-17"
+      PolicyName: CloudFormationDeploymentRolePolicy
+      Roles:
+        - !Ref CloudFormationDeploymentRole
+
+Outputs:
+  CodePipelineCrossAccountRoleArn:
+    Value: !GetAtt CrossAccountRole.Arn
+    Export:
+      Name: CodePipelineCrossAccountRoleArn
+  CrossAccountPipelineTargetAccountId:
+    Value: !Ref AWS::AccountId
+    Export: 
+      Name: CrossAccountPipelineTargetAccountId
