@@ -20,11 +20,11 @@ Parameters:
 Mappings: 
   RegionMap: 
     eu-central-1: 
-      "LambdaSourceBucket": "covestro-git2s3-lambda-source"
+      "LambdaSourceBucket": "xyz-git2s3-lambda-source"
     us-east-1: 
-      "LambdaSourceBucket": "covestro-git2s3-lambda-source-us-east-1"
+      "LambdaSourceBucket": "xyz-git2s3-lambda-source-us-east-1"
     ap-southeast-1: 
-      "LambdaSourceBucket": "covestro-git2s3-lambda-source-ap-southeast-1"
+      "LambdaSourceBucket": "xyz-git2s3-lambda-source-ap-southeast-1"
 
 Resources:
 
@@ -494,7 +494,7 @@ Resources:
           swagger: '2.0'
           info:
             version: '2016-07-26T07:34:38Z'
-            title: !Sub 'G2CP-${AWS::StackName}'
+            title: !Sub 'G2XP-${AWS::StackName}'
           schemes:
             - https
           paths:
